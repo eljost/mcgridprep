@@ -3,6 +3,7 @@
 import argparse
 # from copy import import copy
 import itertools as it
+from pathlib import Path
 from pprint import pprint
 import sys
 import textwrap
@@ -54,11 +55,11 @@ xbas
   ciroot
    {{ ciroot }} {{ ciroot }} 1
  {% endif %}
-*>> copy $Project.RasOrb $backup_path/$Project.{{ id_ }}.RasOrb
+*>> copy $Project.RasOrb $backup_path/{{ id_ }}.RasOrb
 >> copy $Project.RasOrb {{ rasorbs[loop.index0] }}
->> copy $Project.rasscf.molden $backup_path/$Project.rasscf.{{ id_ }}.molden
->> copy $Project.JobIph $backup_path/$Project.{{ id_ }}.JobIph
->> copy $Project.rasscf.h5 $backup_path/$Project.rasscf.{{ id_ }}.h5
+>> copy $Project.rasscf.molden $backup_path/{{ id_ }}.rasscf.molden
+>> copy $Project.JobIph $backup_path/{{ id_ }}.JobIph
+>> copy $Project.rasscf.h5 $backup_path/{{ id_ }}.rasscf.h5
 {% endif %}
 
 {% if ciroot %}
@@ -67,7 +68,7 @@ xbas
  cipr
  mees
 >> rm JOB001
->> copy $Project.rassi.h5 $backup_path/$Project.rassi.cas_{{ id_ }}.h5
+>> copy $Project.rassi.h5 $backup_path/{{ id_ }}.rassi_cas.h5
 {% endif %}
 
 {% if caspt2 %}
@@ -77,7 +78,8 @@ xbas
  {% if ciroot %}
  multistate
   {{ ciroot }}{% for i in range(ciroot) %} {{ i+1 }}{% endfor %}
->> copy $Project.JobMix $backup_path/$Project.{{ id_ }}.JobMix
+
+>> copy $Project.JobMix $backup_path/{{ id_ }}.JobMix
  {% endif %}
 {% endif %}
 
@@ -89,7 +91,7 @@ xbas
  ejob
  mees
 >> rm JOB001
->> copy $Project.rassi.h5 $backup_path/$Project.rassi.caspt2_{{ id_ }}.h5
+>> copy $Project.rassi.h5 $backup_path/{{ id_ }}.rassi_pt2.h5
 {% endif %}
 
 {% if mrci %}
@@ -192,11 +194,11 @@ def run():
 
     methods = args.methods
     name = args.name
-    backup_path = args.backup_path
+    backup_path = Path(args.backup_path).resolve()
 
     job_kwargs = {
         "basis": args.basis,
-        "inporb": args.inporb,
+        "inporb": Path(args.inporb).resolve(),
         "charge": args.charge,
         "spin": args.spin,
         "ciroot": args.ciroot,
@@ -275,9 +277,12 @@ def run():
             handle.write(job)
         print(f"Wrote {fn}")
 
-    left_right = jobs_fns[:2]
-    cols = jobs_fns[2:]
-    import pdb; pdb.set_trace()
+    # left_right = job_fns[:2]
+    # cols = job_fns[2:]
+    job_inputs_fn = "job_inputs"
+    with open(job_inputs_fn, "w") as handle:
+        handle.write("\n".join(job_fns))
+    print(f"Wrote list of all job inputs to '{job_inputs_fn}'")
 
 
 if __name__ == "__main__":

@@ -23,6 +23,7 @@ setup(
     entry_points={
         "console_scripts": [
             "mcgridprep = mcgridprep.main:run",
+            "mcgridrun = mcgridprep.run:run",
         ]
     },
 )

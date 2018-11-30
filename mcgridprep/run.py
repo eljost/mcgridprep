@@ -65,11 +65,12 @@ def run():
     else:
         print("Running in parallel mode.")
 
-        print("Running equilibrium row.")
+        print("Running equilibrium row with 2 processes.")
         with multiprocessing.Pool(2) as pool:
             pool.map(run_part, (left_inp, right_inp))
+        print()
 
-        print("Running columns.")
+        print(f"Running columns with {cpus} processes.")
         with multiprocessing.Pool(cpus) as pool:
             pool.map(run_part, col_inps)
 

@@ -148,27 +148,25 @@ def setup_2d_scan(c1_eq, c2_eq):
     c1_start c1   c1_end
     """
 
-    # Coordinates to propagate the INPORB along the row containing the
-    # equilibirum geometry from where we start.
+    # Coordinates to propagate the INPORB along one row. We start at some
+    # geometry, propably the equilibrium geometry. From the starting point
+    # we propagate the INPORB to the left and to the right in two
+    # calculations.
     c1_left = coords1[:c1_eq_ind][::-1]
     c1_right = coords1[c1_eq_ind:]
     left_coords = (c1_left, [c2_eq, ])
     right_coords = (c1_right, [c2_eq, ])
 
-    # Coordinates for the up and down directions
+    # After propagating the INPORB along one row, we can set up a separate
+    # job for every column. Starting from the first row, we will set up the
+    # coordinates for two directions. Down and up.
     c2_down = coords2[:c2_eq_ind][::-1]
-    # Add 1 so we don't include the line with the equilibrium coordinate.
+    # Add 1 so we don't include the line with the equilibrium coordinate,
+    # as it was already calculated in the left/right calculation.
     c2_up = coords2[c2_eq_ind+1:]
     down_coords = (coords1, c2_down)
     up_coords = (coords1, c2_up)
 
-    coords_tuple = (
-        ("left", left_coords),
-        ("right", right_coords),
-        ("down", down_coords),
-        ("up", up_coords),
-    )
-    # return coords_tuple
     return left_coords, right_coords, down_coords, up_coords
 
 
@@ -202,7 +200,7 @@ def run():
         "charge": args.charge,
         "spin": args.spin,
         "ciroot": args.ciroot,
-        "backup_path": args.backup_path,
+        "backup_path": backup_path,
     }
 
     for method in methods:

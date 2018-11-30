@@ -19,11 +19,14 @@ setup(
     install_requires=[
         "numpy",
         "jinja2",
+        "h5py",
     ],
     entry_points={
         "console_scripts": [
             "mcgridprep = mcgridprep.main:run",
             "mcgridrun = mcgridprep.run:run",
+            "mcgridparse = mcgridprep.parse:run",
+            "mcgridplot = mcgridprep.plot:run",
         ]
     },
 )

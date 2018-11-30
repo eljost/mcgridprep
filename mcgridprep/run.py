@@ -52,8 +52,8 @@ def run_job(job_input, save_path):
     duration = end - start
     mins = duration / 60
     print(f"... calculations in {job_input} took {mins:.1f} min")
-    sys.stdout.flush()
     check_return_codes(out_saved)
+    sys.stdout.flush()
 
 
 def run():

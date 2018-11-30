@@ -71,6 +71,7 @@ def run():
         print()
 
         print(f"Running columns with {cpus} processes.")
+        print(f"I found a total of {len(col_inps)} columns.")
         with multiprocessing.Pool(cpus) as pool:
             pool.map(run_part, col_inps)
 

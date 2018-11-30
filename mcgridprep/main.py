@@ -98,7 +98,6 @@ xbas
 TPL = jinja2.Template(TPL_STR, trim_blocks=True, lstrip_blocks=True)
 
 
-
 def parse_args(args):
     parser = argparse.ArgumentParser()
 
@@ -253,6 +252,7 @@ def run():
     for coords_name, (coords1, coords2) in zip(("down", "up"), coords[2:]):
         for col, inporb in zip(coords1, eq_rasorbs):
             ids, zmats, _ = make_zmats(zmat_tpl, id_fmt, [col, ], coords2)
+            # To set up the columns we use the RasOrbs from the equilibrium row.
             job_kwargs["inporb"] = inporb
             job = TPL.render(**job_kwargs,
                              ids=ids,

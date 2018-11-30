@@ -14,8 +14,7 @@ def run():
 
     angles = np.linspace(180, 30, 31, dtype=int)
     bonds = np.linspace(0.6, 3.5, 30)
-    A, B = np.meshgrid(angles, bonds)#, indexing="ij")
-    import pdb; pdb.set_trace()
+    A, B = np.meshgrid(angles, bonds)
 
     states = grid.shape[-1]
     for state in range(states)[:1]:

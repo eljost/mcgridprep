@@ -57,7 +57,7 @@ def run():
         a_ind = angle_ind(angle)
         b_ind = bond10_ind(bond)
         f = h5py.File(ras_h5)
-        grid[b10_ind, a_ind] = f["ROOT_ENERGIES"][:]
+        grid[b_ind, a_ind] = f["ROOT_ENERGIES"][:]
 
     with open("grid", "wb") as handle:
         np.save(handle, grid)

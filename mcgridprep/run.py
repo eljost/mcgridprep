@@ -6,6 +6,7 @@ import multiprocessing
 import os
 from pathlib import Path
 from pprint import pprint
+import re
 import shutil
 import subprocess
 import sys
@@ -21,6 +22,18 @@ def parse_args(args):
 
     return parser.parse_args(args)
 
+def check_return_codes(fn):
+    with open(fn) as handle:
+        text = handle.read()
+
+    rc_re = "/rc=_(\w+)_"
+    return_codes = re.findall(rc_re, text)
+    fails = [i for i, rc in enumerate(return_codes)
+             if rc != "RC_ALL_IS_WELL"
+    ]
+    if len(return_codes) == 0 or fails:
+        print(f"FAIL {fn} ({[return_codes[i] for i in fails]})")
+
 
 def run_job(job_input, save_path):
     start = time.time()
@@ -32,12 +45,15 @@ def run_job(job_input, save_path):
 
         proc = subprocess.Popen(args, cwd=tmp_dir)
         proc.wait()
-        shutil.copy(tmp_dir / out_path, save_path / Path(out_path).name)
+        out_saved = save_path / Path(out_path).name
+        shutil.copy(tmp_dir / out_path, out_saved)
 
     end = time.time()
     duration = end - start
     mins = duration / 60
     print(f"... calculations in {job_input} took {mins:.1f} min")
+    sys.stdout.flush()
+    check_return_codes(out_saved)
 
 
 def run():
@@ -47,9 +63,8 @@ def run():
     cpus = args.cpus
 
     with open(job_inputs) as handle:
-        job_inputs = handle.read().split("\n")
+        job_inputs = handle.read().strip().split("\n")
     print(f"Loaded {len(job_inputs)} job inputs.")
-    left_inp, right_inp, *col_inps = job_inputs
 
     cwd = Path(os.getcwd())
     save_path = cwd / "out"
@@ -63,6 +78,7 @@ def run():
         print("Running in serial mode.")
         [run_part(inp) for inp in job_inputs]
     else:
+        left_inp, right_inp, *col_inps = job_inputs
         print("Running in parallel mode.")
 
         print("Running equilibrium row with 2 processes.")

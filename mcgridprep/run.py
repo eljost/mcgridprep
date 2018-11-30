@@ -17,7 +17,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser()
 
     parser.add_argument("job_inputs")
-    parser.add_argument("--cpus", type=int, default=4)
+    parser.add_argument("--cpus", type=int, default=1)
 
     return parser.parse_args(args)
 
@@ -52,16 +52,26 @@ def run():
     left_inp, right_inp, *col_inps = job_inputs
 
     cwd = Path(os.getcwd())
+    save_path = cwd / "out"
+    try:
+        os.mkdir(save_path)
+    except FileExistsError:
+        print("./out already exists.")
 
-    run_part = partial(run_job, save_path=cwd)
+    run_part = partial(run_job, save_path=save_path)
+    if cpus == 1:
+        print("Running in serial mode.")
+        [run_part(inp) for inp in job_inputs]
+    else:
+        print("Running in parallel mode.")
 
-    print("Running equilibrium row.")
-    with multiprocessing.Pool(2) as pool:
-        pool.map(run_part, (left_inp, right_inp))
+        print("Running equilibrium row.")
+        with multiprocessing.Pool(2) as pool:
+            pool.map(run_part, (left_inp, right_inp))
 
-    print("Running columns.")
-    with multiprocessing.Pool(cpus) as pool:
-        pool.map(run_part, col_inps)
+        print("Running columns.")
+        with multiprocessing.Pool(cpus) as pool:
+            pool.map(run_part, col_inps)
 
 
 if __name__ == "__main__":

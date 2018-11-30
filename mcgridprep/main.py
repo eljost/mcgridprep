@@ -55,8 +55,7 @@ xbas
   ciroot
    {{ ciroot }} {{ ciroot }} 1
  {% endif %}
-*>> copy $Project.RasOrb $backup_path/{{ id_ }}.RasOrb
->> copy $Project.RasOrb {{ rasorbs[loop.index0] }}
+>> copy $Project.RasOrb $backup_path/{{ id_ }}.RasOrb
 >> copy $Project.rasscf.molden $backup_path/{{ id_ }}.rasscf.molden
 >> copy $Project.JobIph $backup_path/{{ id_ }}.JobIph
 >> copy $Project.rasscf.h5 $backup_path/{{ id_ }}.rasscf.h5
@@ -94,9 +93,6 @@ xbas
 >> copy $Project.rassi.h5 $backup_path/{{ id_ }}.rassi_pt2.h5
 {% endif %}
 
-{% if mrci %}
- &mrci
-{% endif %}
 {% endfor %}
 """
 TPL = jinja2.Template(TPL_STR, trim_blocks=True, lstrip_blocks=True)
@@ -106,7 +102,7 @@ TPL = jinja2.Template(TPL_STR, trim_blocks=True, lstrip_blocks=True)
 def parse_args(args):
     parser = argparse.ArgumentParser()
 
-    methods = "hf mp2 cas caspt2 mrci".split()
+    methods = "hf mp2 cas caspt2".split()
     parser.add_argument("methods", nargs="+", choices=methods)
     parser.add_argument("backup_path")
     parser.add_argument("--basis", default="cc-pvdz")
@@ -243,11 +239,9 @@ def run():
     job_fns = list()
     for coords_name, (coords1, coords2) in zip(("left", "right"), coords[:2]):
         ids, zmats, _ = make_zmats(zmat_tpl, id_fmt, coords1, coords2)
-        rasorbs = rasorb_fns(ids)
         job = TPL.render(**job_kwargs,
                          ids=ids,
                          zmats=zmats,
-                         rasorbs=rasorbs,
         )
         jobs.append(job)
         fn = f"{coords_name}_{method}_{job_kwargs['basis']}.in"
@@ -259,12 +253,10 @@ def run():
     for coords_name, (coords1, coords2) in zip(("down", "up"), coords[2:]):
         for col, inporb in zip(coords1, eq_rasorbs):
             ids, zmats, _ = make_zmats(zmat_tpl, id_fmt, [col, ], coords2)
-            rasorbs = rasorb_fns(ids)
             job_kwargs["inporb"] = inporb
             job = TPL.render(**job_kwargs,
                              ids=ids,
                              zmats=zmats,
-                             rasorbs=rasorbs,
             )
             jobs.append(job)
             fn = f"{coords_name}_{col}_{method}_{job_kwargs['basis']}.in"
@@ -275,8 +267,6 @@ def run():
             handle.write(job)
         print(f"Wrote {fn}")
 
-    # left_right = job_fns[:2]
-    # cols = job_fns[2:]
     job_inputs_fn = "job_inputs"
     with open(job_inputs_fn, "w") as handle:
         handle.write("\n".join(job_fns))

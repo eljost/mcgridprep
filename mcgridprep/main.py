@@ -19,11 +19,21 @@ TPL_STR = """
 
 {% for id_ in ids %}
 &gateway
+{% if zmats %}
 xbas
   {{ basis }}
  zmat
   {{ zmats[loop.index0] }}
  end of zmat
+{% endif %}
+{% if xyzs %}
+ coord
+  {{ xyzs[loop.index0] }}
+ basis
+  {{ basis }}
+ group
+  nosym
+{% endif %}
  ricd
 
 &seward
@@ -182,6 +192,40 @@ def make_zmats(zmat_tpl, id_fmt, coords1, coords2):
     return ids, zmats, coords_grid
 
 
+def make_xyz(angle, bond):
+    beta = angle/2
+    alpha = 90 - beta
+
+    sina = np.sin(np.deg2rad(alpha))
+    sinb = np.sin(np.deg2rad(beta))
+    a = sina * bond
+    b = sinb * bond
+
+    xyz = f"""3
+
+    O  0.00000000  0.00000000  0.00000000
+    H  0.00000000  {b:.8f}  {a:.8f}
+    H  0.00000000  {-b:.8f} {a:.8f}"""
+    return textwrap.dedent(xyz)
+
+
+def make_xyzs(id_fmt, coords1, coords2):
+    coords_grid = list(it.product(coords1, coords2))
+    print("First five internals")
+    print(coords_grid[:5])
+
+    ids = [id_fmt.format(c1, c2) for c1, c2 in coords_grid]
+    xyzs = [make_xyz(angle=c1, bond=c2) for c1, c2 in coords_grid]
+
+    print("First five .xyz-files")
+    for xyz in xyzs[:5]:
+        print(xyz)
+    print("...")
+    print(f"There are {len(xyzs)} .xyz files in total.")
+
+    return ids, xyzs, coords_grid
+
+
 def run():
     args = parse_args(sys.argv[1:])
 
@@ -237,26 +281,28 @@ def run():
     jobs = list()
     job_fns = list()
     for coords_name, (coords1, coords2) in zip(("left", "right"), coords[:2]):
-        ids, zmats, _ = make_zmats(zmat_tpl, id_fmt, coords1, coords2)
+        # ids, zmats, _ = make_zmats(zmat_tpl, id_fmt, coords1, coords2)
+        ids, xyzs, _ = make_xyzs(id_fmt, coords1, coords2)
         job = TPL.render(**job_kwargs,
                          ids=ids,
-                         zmats=zmats,
+                         # zmats=zmats,
+                         xyzs=xyzs,
         )
         jobs.append(job)
         fn = f"{coords_name}_{method}_{job_kwargs['basis']}.in"
         job_fns.append(fn)
 
-    # already expand down and up earlier so we can just use one loop for everything?
-    # propably not ... 
     # Expand up down into their respective columns
     for coords_name, (coords1, coords2) in zip(("down", "up"), coords[2:]):
         for col, inporb in zip(coords1, eq_rasorbs):
-            ids, zmats, _ = make_zmats(zmat_tpl, id_fmt, [col, ], coords2)
+            # ids, zmats, _ = make_zmats(zmat_tpl, id_fmt, [col, ], coords2)
+            ids, xyzs, _ = make_xyzs(id_fmt, [col, ], coords2)
             # To set up the columns we use the RasOrbs from the equilibrium row.
             job_kwargs["inporb"] = inporb
             job = TPL.render(**job_kwargs,
                              ids=ids,
-                             zmats=zmats,
+                             # zmats=zmats,
+                             xyzs=xyzs,
             )
             jobs.append(job)
             fn = f"{coords_name}_{col}_{method}_{job_kwargs['basis']}.in"

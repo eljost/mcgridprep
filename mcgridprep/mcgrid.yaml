@@ -1,0 +1,11 @@
+#name: wasser_grid
+#ciroot: 5
+charge: 0
+spin: 1
+methods: [hf, cas]
+basis: aug-cc-pvdz
+inporb: input.RasOrb
+backup_path: backup
+coord1: [180, 30, 5]
+coord2: [0.6, 3.5, 0.1]
+coord_eq: [105, 1.0]

@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import argparse
-# from copy import import copy
 import itertools as it
 from pathlib import Path
 from pprint import pprint
@@ -10,6 +8,10 @@ import textwrap
 
 import jinja2
 import numpy as np
+
+from mcgridprep.config import config as CONF
+from mcgridprep.helpers import coords_from_spec, ind_for_spec
+
 
 TPL_STR = """
 >> export backup_path={{ backup_path }}
@@ -108,37 +110,14 @@ xbas
 TPL = jinja2.Template(TPL_STR, trim_blocks=True, lstrip_blocks=True)
 
 
-def parse_args(args):
-    parser = argparse.ArgumentParser()
+def setup_2d_scan(coord1_spec, coord2_spec, c_eq):
+    c1_eq, c2_eq = c_eq
 
-    methods = "hf mp2 cas caspt2".split()
-    parser.add_argument("methods", nargs="+", choices=methods)
-    parser.add_argument("backup_path")
-    parser.add_argument("--basis", default="cc-pvdz")
-    parser.add_argument("--inporb", default=None)
-    parser.add_argument("--name", default="job_gen")
-    parser.add_argument("--charge", type=int, default=0)
-    parser.add_argument("--spin", type=int, default=1)
-    parser.add_argument("--ciroot", type=int, default=None)
+    coords1, num1 = coords_from_spec(*coord1_spec)
+    coords2, num2 = coords_from_spec(*coord2_spec)
 
-    return parser.parse_args(args)
-
-
-def setup_2d_scan(c1_eq, c2_eq):
-    coord1_spec = (180, 30, 5)
-    coord2_spec = (0.6, 3.5, 0.1)
-
-    def make_coords(start, end, step):
-        num = round((abs(start-end)/step) + 1)
-        coords = np.linspace(start, end, num)
-        return coords, num
-    coords1, num1 = make_coords(*coord1_spec)
-    coords2, num2 = make_coords(*coord2_spec)
-
-    def ind_from_spec(start, end, step, val):
-        return int((val-start)/step * np.sign(end-start))
-    c1_eq_ind = ind_from_spec(*coord1_spec, c1_eq)
-    c2_eq_ind = ind_from_spec(*coord2_spec, c2_eq)
+    c1_eq_ind = ind_for_spec(*coord1_spec, c1_eq)
+    c2_eq_ind = ind_for_spec(*coord2_spec, c2_eq)
 
     """
     ---------------------
@@ -211,33 +190,33 @@ def make_xyz(angle, bond):
 
 def make_xyzs(id_fmt, coords1, coords2):
     coords_grid = list(it.product(coords1, coords2))
-    print("First five internals")
-    print(coords_grid[:5])
+    # print("First five internals")
+    # print(coords_grid[:5])
 
     ids = [id_fmt.format(c1, c2) for c1, c2 in coords_grid]
     xyzs = [make_xyz(angle=c1, bond=c2) for c1, c2 in coords_grid]
 
-    print("First five .xyz-files")
-    for xyz in xyzs[:5]:
-        print(xyz)
-    print("...")
-    print(f"There are {len(xyzs)} .xyz files in total.")
+    # print("First five .xyz-files")
+    # for xyz in xyzs[:5]:
+        # print(xyz)
+    # print("...")
+    # print(f"There are {len(xyzs)} .xyz files in total.")
 
     return ids, xyzs, coords_grid
 
 
 def run():
-    args = parse_args(sys.argv[1:])
+    print("Job configuration")
+    pprint(CONF)
 
-    methods = args.methods
-    name = args.name
-    backup_path = Path(args.backup_path).resolve()
-
+    methods = CONF["methods"]
+    name = CONF["name"]
+    backup_path = Path(CONF["backup_path"]).resolve()
     job_kwargs = {
-        "basis": args.basis,
-        "charge": args.charge,
-        "spin": args.spin,
-        "ciroot": args.ciroot,
+        "basis": CONF["basis"],
+        "charge": CONF["charge"],
+        "spin": CONF["spin"],
+        "ciroot": CONF["ciroot"],
         "backup_path": backup_path,
     }
 
@@ -247,17 +226,16 @@ def run():
     if "cas" not in methods:
         inporb = None
     else:
-        assert args.inporb
-        inporb = Path(args.inporb).resolve()
+        inporb = Path(CONF["inporb"]).resolve()
     job_kwargs["inporb"] = inporb
 
     method_str = "_".join(methods)
-    print("Using methods:")
-    print(" ".join(methods))
+    # print("Using methods:")
+    # print(" ".join(methods))
     no_print = ("zmats", "ids")
-    pprint({k: v for k, v in job_kwargs.items()
-            if k not in no_print}
-    )
+    # pprint({k: v for k, v in job_kwargs.items()
+            # if k not in no_print}
+    # )
 
     zmat_tpl = """O1
     H2 1 {c2:.2f}
@@ -265,8 +243,10 @@ def run():
 
     id_fmt = "{:.0f}_{:.1f}"
 
-    c1_eq, c2_eq = 105, 1.0
-    coords = setup_2d_scan(c1_eq, c2_eq)
+    coord1_spec = CONF["coord1"]
+    coord2_spec = CONF["coord2"]
+    c_eq = CONF["coord_eq"]
+    coords = setup_2d_scan(coord1_spec, coord2_spec, c_eq)
 
     left_right = [list(it.product(c1, c2)) for c1, c2 in coords[:2]]
     left_right_ids = [id_fmt.format(*cs)
@@ -312,7 +292,7 @@ def run():
     for job, fn in zip(jobs, job_fns):
         with open(fn, "w") as handle:
             handle.write(job)
-        print(f"Wrote {fn}")
+        # print(f"Wrote {fn}")
 
     job_inputs_fn = "job_inputs"
     with open(job_inputs_fn, "w") as handle:

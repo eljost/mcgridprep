@@ -235,7 +235,6 @@ def run():
 
     job_kwargs = {
         "basis": args.basis,
-        "inporb": Path(args.inporb).resolve(),
         "charge": args.charge,
         "spin": args.spin,
         "ciroot": args.ciroot,
@@ -246,9 +245,11 @@ def run():
         job_kwargs[method] = True
 
     if "cas" not in methods:
-        job_kwargs["inporb"] = None
+        inporb = None
     else:
-        assert job_kwargs["inporb"], "With cas --inporb must be set!"
+        assert args.inporb
+        inporb = Path(args.inporb).resolve()
+    job_kwargs["inporb"] = inporb
 
     method_str = "_".join(methods)
     print("Using methods:")

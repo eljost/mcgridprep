@@ -11,6 +11,7 @@ DEFAULTS = {
     "ciroot": None,
     "name": None,
     "inporb": None,
+    "id_fmt": "{:.2f}_{:.2f}",
 }
 
 def load_yaml():

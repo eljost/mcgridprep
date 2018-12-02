@@ -41,6 +41,8 @@ def run():
     coords1, num1 = coords_from_spec(*coord1_spec)
     coords2, num2 = coords_from_spec(*coord2_spec)
 
+    np.save("meshgrid", np.meshgrid(coords1, coords2))
+
     coord1_ind = lambda c1: ind_for_spec(*coord1_spec, c1)
     coord2_ind = lambda c2: ind_for_spec(*coord2_spec, c2)
 

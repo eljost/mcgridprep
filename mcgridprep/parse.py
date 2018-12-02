@@ -21,42 +21,56 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def run():
-    args = parse_args(sys.argv[1:])
-
-    backup_path = Path(args.backup_dir)
-
-    ras_h5s = list(backup_path.glob("*rasscf.h5"))
-    ids = [id_for_fn(fn.name, (int, float)) for fn in ras_h5s]
-    assert len(ids) > 0, f"Couldn't find any HD5 files in '{backup_path}'"
-    print(f"Found {len(ras_h5s)} rasscf HDF5 files.")
-
-    # Determine number of states from the first H5 file
-    h5 = h5py.File(ras_h5s[0])
-    ens = h5["ROOT_ENERGIES"][:]
-    states = ens.size
+def grid_from_rassi_h5s(h5_fns, grid_fn, h5_key="SFS_ENERGIES"):
+    ids = [id_for_fn(fn.name) for fn in h5_fns]
 
     coord1_spec = CONF["coord1"]
     coord2_spec = CONF["coord2"]
     coords1, num1 = coords_from_spec(*coord1_spec)
     coords2, num2 = coords_from_spec(*coord2_spec)
 
-    np.save("meshgrid", np.meshgrid(coords1, coords2))
-
     coord1_ind = lambda c1: ind_for_spec(*coord1_spec, c1)
     coord2_ind = lambda c2: ind_for_spec(*coord2_spec, c2)
 
-    grid = np.zeros((num2, num1, states))
+    h5 = h5py.File(h5_fns[0], "r")
+    ens = h5[h5_key][:]
+    states = ens.size
 
-    for id_, ras_h5 in zip(ids, ras_h5s):
+    grid = np.zeros((num2, num1, states))
+    for id_, h5_fn in zip(ids, h5_fns):
         c1, c2 = id_
         c1_ind = coord1_ind(c1)
         c2_ind = coord2_ind(c2)
-        f = h5py.File(ras_h5)
-        grid[c2_ind,c1_ind] = f["ROOT_ENERGIES"][:]
+        f = h5py.File(h5_fn)
+        grid[c2_ind,c1_ind] = f[h5_key][:]
 
-    with open("rasscf_grid", "wb") as handle:
-        np.save(handle, grid)
+    np.save(grid_fn, grid)
+    print(f"Wrote '{grid_fn}'")
+
+
+
+def run():
+    args = parse_args(sys.argv[1:])
+
+    backup_path = Path(args.backup_dir)
+
+    coord1_spec = CONF["coord1"]
+    coord2_spec = CONF["coord2"]
+    coords1, _ = coords_from_spec(*coord1_spec)
+    coords2, _ = coords_from_spec(*coord2_spec)
+
+    meshgrid_fn = "meshgrid.npy"
+    np.save("meshgrid", np.meshgrid(coords1, coords2))
+    print(f"Wrote coordinate grid to '{meshgrid_fn}'.")
+
+    # ras_h5s = list(backup_path.glob("*.rasscf.h5"))
+    cas_h5s = list(backup_path.glob("*.rassi_cas.h5"))
+    print(f"Found {len(cas_h5s)} rasscf/rassi HDF5 files.")
+    pt2_h5s = list(backup_path.glob("*.rassi_pt2.h5"))
+    print(f"Found {len(pt2_h5s)} caspt2/rassi HDF5 files.")
+
+    grid_from_rassi_h5s(cas_h5s, "rasscf_grid.npy")
+    grid_from_rassi_h5s(pt2_h5s, "caspt2_grid.npy")
 
 
 if __name__ == "__main__":

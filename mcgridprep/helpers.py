@@ -32,9 +32,17 @@ def get_meshgrid():
     return C1, C2
 
 
-def id_for_fn(fn, types):
+def id_for_fn_with_type(fn, types):
     float_re = "([-\d\.]+)"
     regex = f"{float_re}_{float_re}\."
     mobj = re.match(regex, str(fn))
     c1, c2 = [t(float(val)) for t, val in zip(types, mobj.groups())]
+    return c1, c2
+
+
+def id_for_fn(fn):
+    float_re = "([-\d\.]+)"
+    regex = f"{float_re}_{float_re}\."
+    mobj = re.match(regex, str(fn))
+    c1, c2 = [float(val) for val in mobj.groups()]
     return c1, c2

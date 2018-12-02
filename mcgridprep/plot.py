@@ -26,22 +26,26 @@ def run():
     C1, C2 = meshgrid
     print(f"Read coordinates from '{meshgrid_fn}'")
 
-    ras_grid = "rasscf_grid"
+    ras_grid = "rasscf_grid.npy"
     if os.path.exists(ras_grid):
         print("Found grid with &rasscf energies.")
-        ras_energies = np.load("rasscf_grid")
-        plot_grid(C1, C2, ras_energies)
-    else:
-        print("Couldn't find any grid data.")
+        ras_energies = np.load(ras_grid)
+        ras_energies *= 27.2114
+        plot_grid(C1, C2, ras_energies, title="CASSCF")
+
+    pt2_grid = "caspt2_grid.npy"
+    if os.path.exists(pt2_grid):
+        print("Found grid with &caspt2 energies.")
+        pt2_energies = np.load(pt2_grid)
+        pt2_energies *= 27.2114
+        plot_grid(C1, C2, pt2_energies, title="(MS)-CASPT2")
 
 
-def plot_grid(C1, C2, energies, level_num=35):
-    energies *= 27.2114
-
+def plot_grid(C1, C2, energies, title="", level_num=35):
     states = energies.shape[-1]
     for state in range(states):
         fig, ax = plt.subplots()
-        fig.suptitle(f"State {state}")
+        fig.suptitle(f"{title}, State {state}")
         state_ens = energies[:,:,state]
         state_ens -= state_ens.min()
         state_ens = np.nan_to_num(state_ens)

@@ -116,6 +116,8 @@ def setup_2d_scan(coord1_spec, coord2_spec, c_eq):
 
     coords1, num1 = coords_from_spec(*coord1_spec)
     coords2, num2 = coords_from_spec(*coord2_spec)
+    total_points = coords1.size * coords2.size
+    print(f"There are a total of {total_points} points in the grid.")
 
     eq_inside_grid = (coords1.min() <= c1_eq <= coords1.max()
                       and coords2.min() <= c2_eq <= coords2.max()

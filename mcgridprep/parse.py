@@ -3,6 +3,7 @@
 import argparse
 import itertools as it
 from pathlib import Path
+from pprint import pprint
 import re
 import sys
 
@@ -10,7 +11,7 @@ import h5py
 import numpy as np
 
 from mcgridprep.config import config as CONF
-from mcgridprep.helpers import ind_for_spec, id_for_fn, coords_from_spec
+from mcgridprep.helpers import ind_for_spec, id_for_fn, coords_from_spec, get_all_ids
 
 
 def parse_args(args):
@@ -23,6 +24,11 @@ def parse_args(args):
 
 def grid_from_rassi_h5s(h5_fns, grid_fn, h5_key="SFS_ENERGIES"):
     ids = [id_for_fn(fn.name) for fn in h5_fns]
+
+    # all_ids_set = set(get_all_ids())
+    # missing_ids = all_ids_set - set(ids)
+    # print("HDF5 files are missing for:")
+    # pprint(missing_ids)
 
     coord1_spec = CONF["coord1"]
     coord2_spec = CONF["coord2"]

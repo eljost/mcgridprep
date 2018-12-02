@@ -44,13 +44,15 @@ def run():
 def plot_grid(C1, C2, energies, title="", level_num=35):
     states = energies.shape[-1]
     title_slug = slugify(title)
+
+    levels = np.linspace(0, 5, level_num)**2
+    # levels = np.logspace(-4, 2.5, 20, base=2)
     for state in range(states):
         fig, ax = plt.subplots()
         fig.suptitle(f"{title}, State {state}")
         state_ens = energies[:,:,state]
         state_ens -= state_ens.min()
         state_ens = np.nan_to_num(state_ens)
-        levels = np.linspace(0, 5, level_num)**2
         ax.contour(C1, C2, state_ens, levels=levels)
         ax.set_xlabel(CONF["coord1_lbl"])
         ax.set_ylabel(CONF["coord2_lbl"])

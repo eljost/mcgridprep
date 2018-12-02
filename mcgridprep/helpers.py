@@ -1,3 +1,4 @@
+import itertools as it
 import re
 
 import numpy as np
@@ -46,6 +47,13 @@ def id_for_fn(fn):
     mobj = re.match(regex, str(fn))
     c1, c2 = [float(val) for val in mobj.groups()]
     return c1, c2
+
+
+def get_all_ids():
+    coords1, _, coords2, _ = load_coords()
+    prod = it.product(coords1, coords2)
+    all_ids = [CONF["id_fmt"].format(c1, c2) for c1, c2 in prod]
+    return all_ids
 
 
 def slugify(inp_str):

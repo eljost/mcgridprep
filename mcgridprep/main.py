@@ -96,7 +96,7 @@ xbas
 {% endif %}
 
 
-{% if ciroot %}
+{% if caspt2 and ciroot %}
 >> copy $Project.JobMix JOB001
 &rassi
  cipr
@@ -253,7 +253,7 @@ def run():
     H2 1 {c2:.2f}
     H3 1 {c2:.2f} 2 {c1:.1f}"""
 
-    id_fmt = "{:.0f}_{:.1f}"
+    id_fmt = CONF["id_fmt"]
 
     coord1_spec = CONF["coord1"]
     coord2_spec = CONF["coord2"]

@@ -64,6 +64,7 @@ def run():
 
     with open(job_inputs) as handle:
         job_inputs = handle.read().strip().split("\n")
+    pprint(job_inputs)
     print(f"Loaded {len(job_inputs)} job inputs.")
 
     cwd = Path(os.getcwd())

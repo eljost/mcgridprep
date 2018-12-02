@@ -46,3 +46,8 @@ def id_for_fn(fn):
     mobj = re.match(regex, str(fn))
     c1, c2 = [float(val) for val in mobj.groups()]
     return c1, c2
+
+
+def slugify(inp_str):
+    inp_str = inp_str.replace("-", "_").replace("(", "").replace(")", "")
+    return inp_str

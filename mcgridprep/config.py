@@ -12,6 +12,8 @@ DEFAULTS = {
     "name": None,
     "inporb": None,
     "id_fmt": "{:.2f}_{:.2f}",
+    "coord1_lbl": "",
+    "coord2_lbl": "",
 }
 
 def load_yaml():

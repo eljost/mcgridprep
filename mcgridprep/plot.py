@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from mcgridprep.config import config as CONF
-from mcgridprep.helpers import coords_from_spec
+from mcgridprep.helpers import coords_from_spec, slugify
 
 
 def parse_args(args):
@@ -43,6 +43,7 @@ def run():
 
 def plot_grid(C1, C2, energies, title="", level_num=35):
     states = energies.shape[-1]
+    title_slug = slugify(title)
     for state in range(states):
         fig, ax = plt.subplots()
         fig.suptitle(f"{title}, State {state}")
@@ -51,7 +52,12 @@ def plot_grid(C1, C2, energies, title="", level_num=35):
         state_ens = np.nan_to_num(state_ens)
         levels = np.linspace(0, 5, level_num)**2
         ax.contour(C1, C2, state_ens, levels=levels)
+        ax.set_xlabel(CONF["coord1_lbl"])
+        ax.set_ylabel(CONF["coord2_lbl"])
         plt.show()
+        out_fn = f"{title_slug}_state_{state:02d}.pdf"
+        fig.savefig(out_fn)
+        print(f"Wrote {out_fn}")
 
 
 if __name__ == "__main__":

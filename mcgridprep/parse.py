@@ -69,14 +69,16 @@ def run():
     np.save("meshgrid", np.meshgrid(coords1, coords2))
     print(f"Wrote coordinate grid to '{meshgrid_fn}'.")
 
-    # ras_h5s = list(backup_path.glob("*.rasscf.h5"))
-    cas_h5s = list(backup_path.glob("*.rassi_cas.h5"))
-    print(f"Found {len(cas_h5s)} rasscf/rassi HDF5 files.")
-    pt2_h5s = list(backup_path.glob("*.rassi_pt2.h5"))
-    print(f"Found {len(pt2_h5s)} caspt2/rassi HDF5 files.")
+    cas_h5s = list(backup_path.glob("*.rasscf.h5"))
+    print(f"Found {len(cas_h5s)} rasscf HDF5 files.")
+    cas_rassi_h5s = list(backup_path.glob("*.rassi_cas.h5"))
+    print(f"Found {len(cas_rassi_h5s)} rasscf/rassi HDF5 files.")
+    pt2_rassi_h5s = list(backup_path.glob("*.rassi_pt2.h5"))
+    print(f"Found {len(pt2_rassi_h5s)} caspt2/rassi HDF5 files.")
 
-    grid_from_rassi_h5s(cas_h5s, "rasscf_grid.npy")
-    grid_from_rassi_h5s(pt2_h5s, "caspt2_grid.npy")
+    grid_from_rassi_h5s(cas_h5s, "rasscf_grid.npy", h5_key="ROOT_ENERGIES")
+    grid_from_rassi_h5s(cas_rassi_h5s, "rasscf_grid.npy")
+    grid_from_rassi_h5s(pt2_rassi_h5s, "caspt2_grid.npy")
 
 
 if __name__ == "__main__":

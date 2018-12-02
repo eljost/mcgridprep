@@ -3,11 +3,15 @@ ciroot: 2
 charge: 0
 spin: 1
 # methods: [hf, mp2, cas, caspt2]
-methods: [cas, ]
+methods: [cas, caspt2]
 basis: aug-cc-pvtz
 inporb: /scratch/molcas_jobs/water_rigid/backup/07_rasscf_augtz/water_rigid.RasOrb
 backup_path: backup
-coord1: [120, 80, 2]
-coord2: [0.6, 1.2, 0.05]
+#coord1: [120, 80, 2]
+#coord2: [0.6, 1.2, 0.05]
+coord1: [110, 90, 5]
+coord2: [0.7, 1.1, 0.1]
+coord1_lbl: "∠(H-O-H) / deg"
+coord2_lbl: "r(O-H)_sym / Å"
 coord_eq: [100, 0.9]
 #id_fmt: "{:.0f}_{:.1f}"

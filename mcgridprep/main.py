@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import itertools as it
+import os
 from pathlib import Path
 from pprint import pprint
 import sys
@@ -116,6 +117,11 @@ def setup_2d_scan(coord1_spec, coord2_spec, c_eq):
     coords1, num1 = coords_from_spec(*coord1_spec)
     coords2, num2 = coords_from_spec(*coord2_spec)
 
+    eq_inside_grid = (coords1.min() <= c1_eq <= coords1.max()
+                      and coords2.min() <= c2_eq <= coords2.max()
+    )
+    assert eq_inside_grid, "Your starting point lies outside the grid!"
+
     c1_eq_ind = ind_for_spec(*coord1_spec, c1_eq)
     c2_eq_ind = ind_for_spec(*coord2_spec, c2_eq)
 
@@ -211,7 +217,13 @@ def run():
 
     methods = CONF["methods"]
     name = CONF["name"]
+
     backup_path = Path(CONF["backup_path"]).resolve()
+    try:
+        os.mkdir(backup_path)
+        print(f"Created backup directory at '{backup_path}'")
+    except FileExistsError:
+        print("Skipping creation of backup directory, as it already exists.")
     job_kwargs = {
         "basis": CONF["basis"],
         "charge": CONF["charge"],

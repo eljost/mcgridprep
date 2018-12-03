@@ -91,6 +91,7 @@ def run():
         print(f"I found a total of {len(col_inps)} columns.")
         with multiprocessing.Pool(cpus) as pool:
             pool.map(run_part, col_inps)
+    print("Finished all calculations.")
 
 
 if __name__ == "__main__":

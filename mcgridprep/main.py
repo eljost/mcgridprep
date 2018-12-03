@@ -106,6 +106,10 @@ xbas
 >> copy $Project.rassi.h5 $backup_path/{{ id_ }}.rassi_pt2.h5
 {% endif %}
 
+{% if loprop %}
+&loprop
+{% endif %}
+
 {% endfor %}
 """
 TPL = jinja2.Template(TPL_STR, trim_blocks=True, lstrip_blocks=True)

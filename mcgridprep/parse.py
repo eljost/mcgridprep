@@ -23,6 +23,8 @@ def parse_args(args):
 
 
 def grid_from_rassi_h5s(h5_fns, grid_fn, h5_key="SFS_ENERGIES"):
+    if len(h5_fns) == 0:
+        return
     ids = [id_for_fn(fn.name) for fn in h5_fns]
 
     # all_ids_set = set(get_all_ids())
@@ -52,7 +54,6 @@ def grid_from_rassi_h5s(h5_fns, grid_fn, h5_key="SFS_ENERGIES"):
 
     np.save(grid_fn, grid)
     print(f"Wrote '{grid_fn}'")
-
 
 
 def run():

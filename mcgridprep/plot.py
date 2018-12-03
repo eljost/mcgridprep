@@ -26,6 +26,24 @@ def run():
     C1, C2 = meshgrid
     print(f"Read coordinates from '{meshgrid_fn}'")
 
+    pol_grid = "polarization_grid.npy"
+    if os.path.exists(pol_grid):
+        print("Found grid with polarizations.")
+        pols = np.load(pol_grid)
+        fig, axs = plt.subplots(3, sharex=True, sharey=True)
+        axx = pols[:,:,0]
+        ayy = pols[:,:,2]
+        azz = pols[:,:,5]
+        comps = "xx yy zz".split()
+        label = "$\\alpha_{xx}$"
+        for ax, alpha, comp in zip(axs, (axx, ayy, azz), comps):
+            conf = ax.contourf(C1, C2, alpha)
+            ax.set_title(f"$\\alpha_{{{comp}}}$")
+        ax.set_xlabel(CONF["coord1_lbl"])
+        ax.set_ylabel(CONF["coord2_lbl"])
+        fig.colorbar(conf, ax=axs.ravel().tolist())
+        plt.show()
+
     ras_grid = "rasscf_grid.npy"
     if os.path.exists(ras_grid):
         print("Found grid with &rasscf energies.")

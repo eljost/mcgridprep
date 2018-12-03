@@ -39,6 +39,8 @@ xbas
 {% endif %}
  ricd
 
+>> echo "*# {{ id_ }} #*"
+
 &seward
 
 {% if hf %}

@@ -49,6 +49,23 @@ def id_for_fn(fn):
     return c1, c2
 
 
+def id_from_log(text):
+    """Parse the ID string ("*# C1_C2 #*") from a log file."""
+    float_re = "([\.\d\-]+)"
+    id_re = f"\*# {float_re}_{float_re} #\*"
+    mobj = re.search(id_re, text)
+    return [float(c) for c in mobj.groups()]
+
+
+def ids_from_log(text):
+    float_re = "([\.\d\-]+)"
+    id_re = f"\*# {float_re}_{float_re} #\*"
+    return [(float(c1), float(c2)) for c1, c2 in re.findall(id_re, text)]
+    # doubled_ids = re.findall(id_re, text)
+    # unique_ids = doubled_ids[:len(doubled_ids) // 2]
+    # return [(float(c1), float(c2)) for c1, c2 in unique_ids]
+
+
 def get_all_ids():
     coords1, _, coords2, _ = load_coords()
     prod = it.product(coords1, coords2)

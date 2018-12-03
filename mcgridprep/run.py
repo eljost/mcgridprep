@@ -22,6 +22,7 @@ def parse_args(args):
 
     return parser.parse_args(args)
 
+
 def check_return_codes(fn):
     with open(fn) as handle:
         text = handle.read()

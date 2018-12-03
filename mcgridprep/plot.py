@@ -47,15 +47,20 @@ def plot_grid(C1, C2, energies, title="", level_num=35):
 
     levels = np.linspace(0, 5, level_num)**2
     # levels = np.logspace(-4, 2.5, 20, base=2)
+    # # As we will never reach 0 with logspace ...
+    # levels[0] = 0.0
     for state in range(states):
         fig, ax = plt.subplots()
         fig.suptitle(f"{title}, State {state}")
         state_ens = energies[:,:,state]
         state_ens -= state_ens.min()
         state_ens = np.nan_to_num(state_ens)
-        ax.contour(C1, C2, state_ens, levels=levels)
+        conf = ax.contourf(C1, C2, state_ens, levels=levels)
+        ax.contour(C1, C2, state_ens, levels=levels, colors="w", linewidths=1)
         ax.set_xlabel(CONF["coord1_lbl"])
         ax.set_ylabel(CONF["coord2_lbl"])
+        cb = fig.colorbar(conf)
+        cb.set_label("$\Delta E / eV$")
         plt.show()
         out_fn = f"{title_slug}_state_{state:02d}.pdf"
         fig.savefig(out_fn)

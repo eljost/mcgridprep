@@ -72,3 +72,15 @@ To setup a calculation you just have to decide on the two grid coordinates (`coo
 3. Excecute `mcgridrun job_inputs --cpus 4` to run all jobs stored in `job_inputs` with four calculations in parallel. --cpus should be set to an appropriate number.
 4. After or while the calculations are running you can call `mcgridparse` to extract the calculated informations. The command should be run from the `[root]` folder.
 5. To plot the data run `mcgridplot` in `[root]`.
+
+## Working example
+A working example can be found in the `tests/01_example` subfolder. You just have to adapt the `inporb` path in `mcgrid.yaml` and the `MOLCAS` variable in setmolcas.sh.
+To run everything:
+```
+cd tests/01_example
+mcgridprep
+source setmolcas.sh
+mcgridrun job_inputs --cpus 4
+mcgridparse
+mcgridplot
+```

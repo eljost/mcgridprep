@@ -1,0 +1,11 @@
+charge: 0
+spin: 1
+methods: [cas, ]
+basis: aug-cc-pvtz
+inporb: /scratch/programme/mcgridprep/tests/01_example/water_rigid.RasOrb
+backup_path: backup
+coord1: [110, 90, 5]
+coord2: [0.7, 1.1, 0.1]
+coord1_lbl: "∠(H-O-H) / deg"
+coord2_lbl: "r(O-H)_sym / Å"
+coord_eq: [105, 1.0]

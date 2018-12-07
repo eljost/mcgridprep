@@ -48,10 +48,10 @@ def parse_loprop(text):
     return pols
 
 
-def parse_caspt2(text):
+def parse_caspt2(text, skip=None):
     pt2_re =  "CASPT2 Root\s+\d+\s+Total energy:\s+([\d\-\.]+)"
     pt2_energies = [float(e) for e in re.findall(pt2_re, text)]
-    return pt2_energies
+    return pt2_energies[:-skip]
 
 
 def parse_logs(fns, grid_dims):
@@ -89,8 +89,9 @@ def parse_logs(fns, grid_dims):
         print("Found caspt2 keyword.")
         pt2_grid_fn = "caspt2_grid.npy"
         pt2_grid = np.zeros((num2, num1, states))
+        skip = 6 if "loprop" in CONF["methods"] else None
         for (c2_ind, c1_ind), text in zip(inds, calc_texts):
-            pt2_energy = parse_caspt2(text)
+            pt2_energy = parse_caspt2(text, skip)
             pt2_grid[c2_ind, c1_ind] = pt2_energy
         np.save(pt2_grid_fn, pt2_grid)
         print(f"Wrote CASPT2 energies to '{pt2_grid_fn}'")

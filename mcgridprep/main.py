@@ -92,6 +92,9 @@ xbas
  {% if ciroot %}
  multistate
   {{ ciroot }}{% for i in range(ciroot) %} {{ i+1 }}{% endfor %}
+ {% if loprop %}
+ properties
+ {% endif %}
 
 >> copy $Project.JobMix $backup_path/{{ id_ }}.JobMix
  {% endif %}

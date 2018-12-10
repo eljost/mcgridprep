@@ -24,12 +24,12 @@ def ind_for_spec(start, end, step, val):
     return int(round((val-start)/step) * np.sign(end-start))
 
 
-def get_meshgrid():
+def get_meshgrid(indexing="xy"):
     coord1_spec = CONF["coord1"]
     coord2_spec = CONF["coord2"]
     coords1, _ = coords_from_spec(*coord1_spec)
     coords2, _ = coords_from_spec(*coord2_spec)
-    C1, C2 = np.meshgrid(coords1, coords2)
+    C1, C2 = np.meshgrid(coords1, coords2, indexing=indexing)
     return C1, C2
 
 

@@ -24,25 +24,21 @@ def run():
     cwd = Path(".")
     logs = natsorted(cwd.glob("./*/dalton_xyz.out"))
 
-    # import pdb; pdb.set_trace()
-    # id_re = f"{float_re}_{float_re}"
-    # ids = [re.match(id_re, str(log)) for log in logs]
-    # coord1, coord2 = zip(*ids)
-    # print(ids)
     coord1, num1, coord2, num2 = load_coords()
-    C1, C2 = get_meshgrid()
+    C1, C2 = get_meshgrid(indexing="ij")
     ids = get_all_ids()
     fns = [Path(id_) / "dalton_xyz.out" for id_ in ids]
     with multiprocessing.Pool(4) as pool:
         energies = pool.map(get_energy, fns)
-    energies = np.array(energies).reshape(num2, num1)
-    # print(energies)
-    # print(ids)
+    energies = np.array(energies).reshape(num1, num2)
+    energies -= energies.min()
+    energies *= 27.2114
     fig, ax = plt.subplots()
-    ax.contourf(C1, C2, energies)
+    levels = np.linspace(0, 25, 35)
+    cf = ax.contourf(C1, C2, energies, levels=levels)
+    ax.contour(C1, C2, energies, colors="w", levels=levels)
+    fig.colorbar(cf)
     plt.show()
-
-
 
 
 if __name__ == "__main__":

@@ -48,10 +48,16 @@ def run():
         log_path = Path(f"{c1:.2f}_{c2:.2f}/dalton_xyz.out")
         if not log_path.is_file():
             continue
-        en = get_energy(log_path)
-        energies[i,j] = en
-        stat_pol = get_stat_pol(log_path)
-        stat_pols[i,j] = stat_pol
+        try:
+            en = get_energy(log_path)
+            energies[i,j] = en
+        except:
+            print("Error while parsing energy from {c1}_{c2}")
+        try:
+            stat_pol = get_stat_pol(log_path)
+            stat_pols[i,j] = stat_pol
+        except:
+            print("Error while parsing static polarizabilities from {c1}_{c2}")
 
     not_nan = np.invert(np.isnan(energies))
     energies[not_nan] -= energies[not_nan].min()
@@ -69,7 +75,7 @@ def run():
         ax = axs[i]
         sp = stat_pols[:,:,i]
         cf = ax.contourf(C1, C2, sp, levels=pol_levels)
-        ax.contour(C1, C2, sp, colors="w", levels=pol_levels)
+        # ax.contour(C1, C2, sp, colors="w", levels=pol_levels)
     fig.colorbar(cf, ax=axs.ravel().tolist())
     plt.show()
 

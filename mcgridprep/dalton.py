@@ -30,6 +30,7 @@ def parse_args(args):
 
     parser.add_argument("--run", action="store_true")
     parser.add_argument("--cpus", type=int, default=4)
+    parser.add_argument("--mem", type=int, default=2000)
 
     return parser.parse_args(args)
 
@@ -154,7 +155,7 @@ def run_job(job_dir, prev_job_dir=None):
     prev_path = Path(prev_job_dir).resolve()
     prev_sirius = prev_path / "SIRIUS.RST"
     shutil.copy(prev_sirius, cur_path)
-    args = f"dalton -put SIRIUS.RST -get SIRIUS.RST {DAL_FN} {MOL_FN}".split()
+    args = f"dalton -mb {MEM} -put SIRIUS.RST -get SIRIUS.RST {DAL_FN} {MOL_FN}".split()
     proc = subprocess.Popen(args, cwd=cur_path)
     proc.wait()
     end = time.time()
@@ -175,6 +176,8 @@ def run():
     args = parse_args(sys.argv[1:])
 
     cpus = args.cpus
+    global MEM
+    MEM = args.mem
 
     job_dict = prepare_job_dirs()
     print(job_dict)
@@ -184,6 +187,7 @@ def run():
     # run_job(left[1], prev_left[1])
 
     if args.run:
+        start = time.time()
         left_right = (job_dict["left"], job_dict["right"])
         with multiprocessing.Pool(2) as pool:
             pool.map(run_part, left_right)
@@ -191,6 +195,9 @@ def run():
         cols = [v for k, v in job_dict.items() if k not in ("left", "right")]
         with multiprocessing.Pool(cpus) as pool:
             pool.map(run_part, cols)
+        end = time.time()
+        duration = end - start
+        print("Calculations took {duration/60:.1f} min.")
 
 
 if __name__ == "__main__":

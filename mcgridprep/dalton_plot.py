@@ -26,12 +26,18 @@ def run():
 
     coord1, num1, coord2, num2 = load_coords()
     C1, C2 = get_meshgrid(indexing="ij")
-    ids = get_all_ids()
-    fns = [Path(id_) / "dalton_xyz.out" for id_ in ids]
-    with multiprocessing.Pool(4) as pool:
-        energies = pool.map(get_energy, fns)
-    energies = np.array(energies).reshape(num1, num2)
-    energies -= energies.min()
+    energies = np.full_like(C1, np.nan)
+    for (i, j), _ in np.ndenumerate(energies):
+        c1 = C1[i,j]
+        c2 = C2[i,j]
+        log_path = Path(f"{c1:.2f}_{c2:.2f}/dalton_xyz.out")
+        if not log_path.is_file():
+            continue
+        en = get_energy(log_path)
+        energies[i,j] = en
+
+    not_nan = np.invert(np.isnan(energies))
+    energies[not_nan] -= energies[not_nan].min()
     energies *= 27.2114
     fig, ax = plt.subplots()
     levels = np.linspace(0, 25, 35)

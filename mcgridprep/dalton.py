@@ -29,6 +29,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--run", action="store_true")
+    parser.add_argument("--cpus", type=int, default=4)
 
     return parser.parse_args(args)
 
@@ -173,6 +174,8 @@ def run_part(args):
 def run():
     args = parse_args(sys.argv[1:])
 
+    cpus = args.cpus
+
     job_dict = prepare_job_dirs()
     print(job_dict)
     # left, prev_left  = job_dict["left"]
@@ -186,7 +189,7 @@ def run():
             pool.map(run_part, left_right)
 
         cols = [v for k, v in job_dict.items() if k not in ("left", "right")]
-        with multiprocessing.Pool(4) as pool:
+        with multiprocessing.Pool(cpus) as pool:
             pool.map(run_part, cols)
 
 

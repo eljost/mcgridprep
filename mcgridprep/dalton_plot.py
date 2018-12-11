@@ -76,6 +76,3 @@ def run():
 
 if __name__ == "__main__":
     run()
-    # fn = "/scratch/wasser_dalton_fine/105.00_1.00/dalton_xyz.out"
-    # pols = get_pol(fn)
-    # print(pols)

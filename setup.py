@@ -8,7 +8,7 @@ if sys.version_info.major < 3:
 
 setup(
     name="mcgridprep",
-    version="0.3.6",
+    version="0.3.7",
     description="Prepare/run 2D grids using OpenMolcas.",
     url="https://github.com/eljost/mcgridprep",
     maintainer="Johannes Steinmetzer",
@@ -27,6 +27,8 @@ setup(
             "mcgridrun = mcgridprep.run:run",
             "mcgridparse = mcgridprep.parse:run",
             "mcgridplot = mcgridprep.plot:run",
+            "daltongrid = mcgridprep.dalton:run",
+            "daltonplot = mcgridprep.dalton_plot:run",
         ]
     },
 )

@@ -8,7 +8,7 @@ if sys.version_info.major < 3:
 
 setup(
     name="mcgridprep",
-    version="0.3.8",
+    version="0.3.9",
     description="Prepare/run 2D grids using OpenMolcas.",
     url="https://github.com/eljost/mcgridprep",
     maintainer="Johannes Steinmetzer",
@@ -16,6 +16,7 @@ setup(
     license="GPL 3",
     platforms=["unix"],
     packages=find_packages(),
+    package_data={"mcgridprep": ["templates/*.tpl", ],},
     install_requires=[
         "numpy",
         "jinja2",

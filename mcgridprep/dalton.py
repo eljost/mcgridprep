@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 from collections import Counter
 import itertools as it
 import multiprocessing
@@ -8,6 +9,7 @@ from pprint import pprint
 import os
 import shutil
 import subprocess
+import sys
 import time
 
 import numpy as np
@@ -23,6 +25,14 @@ MOL_FN = "xyz.mol"
 DAL_FN = "dalton.dal"
 
 
+def parse_args(args):
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--run", action="store_true")
+
+    return parser.parse_args(args)
+
+
 def prepare_mol(atoms, coords, basis, charge):
     atom_counter = Counter(atoms)
     elements = list(atom_counter.keys())
@@ -33,10 +43,10 @@ def prepare_mol(atoms, coords, basis, charge):
     atoms_data = list()
     for elem, elem_coords in coords_by_elem:
         atom_num = atom_counter[elem]
-        charge = ELEMENTS[elem].number
+        elem_charge = ELEMENTS[elem].number
         elem_coords = list(elem_coords)
         atoms_data.append((
-                    charge,
+                    elem_charge,
                     atom_num,
                     elem_coords,
         ))
@@ -135,7 +145,9 @@ def run_job(job_dir, prev_job_dir=None):
     start = time.time()
     print(f"Running {job_dir}")
     if prev_job_dir is None:
-        prev_job_dir = "/scratch/wasser_dalton/start"
+        # prev_job_dir = "/scratch/wasser_dalton/start"
+        cwd = Path(".").resolve()
+        prev_job_dir = cwd / "start"
 
     cur_path = Path(job_dir).resolve()
     prev_path = Path(prev_job_dir).resolve()
@@ -159,20 +171,23 @@ def run_part(args):
 
 
 def run():
+    args = parse_args(sys.argv[1:])
+
     job_dict = prepare_job_dirs()
     print(job_dict)
     # left, prev_left  = job_dict["left"]
-    # run_job(left[0], prev_left[0])
     # import pdb; pdb.set_trace()
+    # run_job(left[0], prev_left[0])
     # run_job(left[1], prev_left[1])
 
-    left_right = (job_dict["left"], job_dict["right"])
-    with multiprocessing.Pool(2) as pool:
-        pool.map(run_part, left_right)
+    if args.run:
+        left_right = (job_dict["left"], job_dict["right"])
+        with multiprocessing.Pool(2) as pool:
+            pool.map(run_part, left_right)
 
-    cols = [v for k, v in job_dict.items() if k not in ("left", "right")]
-    with multiprocessing.Pool(4) as pool:
-        pool.map(run_part, cols)
+        cols = [v for k, v in job_dict.items() if k not in ("left", "right")]
+        with multiprocessing.Pool(4) as pool:
+            pool.map(run_part, cols)
 
 
 if __name__ == "__main__":

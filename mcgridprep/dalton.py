@@ -52,11 +52,12 @@ def prepare_mol(atoms, coords, basis, charge):
                     atom_num,
                     elem_coords,
         ))
+    sym_str = "" if CONF["dal_sym"] else "NoSymmetry"
     mol = MOL_TPL.render(
                       basis=basis,
                       charge=charge,
                       atoms_data=atoms_data,
-                      sym_str="NoSymmetry"
+                      sym_str=sym_str,
     )
     return mol
 
@@ -197,7 +198,7 @@ def run():
             pool.map(run_part, cols)
         end = time.time()
         duration = end - start
-        print("Calculations took {duration/60:.1f} min.")
+        print(f"Calculations took {duration/60:.1f} min.")
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from natsort import natsorted
 import numpy as np
 
+from mcgridprep.config import config as CONF
 from mcgridprep.helpers import get_meshgrid, get_all_ids, load_coords
 
 
@@ -42,9 +43,11 @@ def run():
     C1, C2 = get_meshgrid(indexing="ij")
     energies = np.full_like(C1, np.nan)
     stat_pols = np.full((*C1.shape, 3), np.nan)
+    id_fmt = CONF["id_fmt"]
     for (i, j), _ in np.ndenumerate(energies):
         c1 = C1[i,j]
         c2 = C2[i,j]
+        id_ = id_fmt.format(c1, c2)
         log_path = Path(f"{c1:.2f}_{c2:.2f}/dalton_xyz.out")
         if not log_path.is_file():
             continue
@@ -52,12 +55,12 @@ def run():
             en = get_energy(log_path)
             energies[i,j] = en
         except:
-            print("Error while parsing energy from {c1}_{c2}")
+            print(f"Error while parsing energy from {id_}")
         try:
             stat_pol = get_stat_pol(log_path)
             stat_pols[i,j] = stat_pol
         except:
-            print("Error while parsing static polarizabilities from {c1}_{c2}")
+            print(f"Error while parsing static polarizabilities from {id_}")
 
     not_nan = np.invert(np.isnan(energies))
     energies[not_nan] -= energies[not_nan].min()
@@ -70,7 +73,7 @@ def run():
     plt.show()
 
     fig, axs = plt.subplots(3)
-    pol_levels = np.linspace(0, 20, 10)
+    pol_levels = np.linspace(0, 50, 30)
     for i in range(3):
         ax = axs[i]
         sp = stat_pols[:,:,i]

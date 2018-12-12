@@ -8,7 +8,7 @@ if sys.version_info.major < 3:
 
 setup(
     name="mcgridprep",
-    version="0.4.0",
+    version="0.4.1",
     description="Prepare/run 2D grids using OpenMolcas.",
     url="https://github.com/eljost/mcgridprep",
     maintainer="Johannes Steinmetzer",

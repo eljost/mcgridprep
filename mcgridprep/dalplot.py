@@ -26,7 +26,7 @@ def plot_dpms(C1, C2, dpms):
     dpm_levels = np.linspace(0, 2, 30)
     for i in range(3):
         ax = axs[i]
-        d = dpms[:,:,i]
+        d = dpms[:, :, i]
         cf = ax.contourf(C1, C2, d, levels=dpm_levels)
         # ax.clabel(cf, colors="w", fmt="%.2f")
     fig.colorbar(cf, ax=axs.ravel().tolist())
@@ -39,7 +39,7 @@ def plot_stat_pols(C1, C2, stat_pols):
     pol_levels = np.linspace(0, 50, 30)
     for i in range(3):
         ax = axs[i]
-        sp = stat_pols[:,:,i]
+        sp = stat_pols[:, :, i]
         cf = ax.contourf(C1, C2, sp, levels=pol_levels)
         # ax.clabel(cf, colors="w", fmt="%.2f")
         # ax.contour(C1, C2, sp, colors="w", levels=pol_levels)
@@ -53,7 +53,7 @@ def smooth2d():
     C1, C2 = get_meshgrid(indexing="ij")
     # plot_stat_pols(C1, C2, stat_pols)
     from scipy.interpolate import Rbf
-    axx = stat_pols[:,:,0]
+    axx = stat_pols[:, :, 0]
     nans = np.isnan(axx)
     # mean = axx[~nans].mean()
     # axx[nans] = mean

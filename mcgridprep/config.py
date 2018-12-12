@@ -23,7 +23,10 @@ def load_yaml():
     look_in_dirs = [".", ".."]
 
     paths = [Path(dir_) / yaml_fn for dir_ in look_in_dirs]
-    yaml_path = [p for p in paths if p.is_file()][0]
+    yaml_paths = [p for p in paths if p.is_file()]
+    if len(yaml_paths) == 0:
+        print("Couldn't find '{yaml_fn}'. Exiting!")
+    yaml_path = yaml_paths[0]
     print(f"Using parameters from '{yaml_path}'")
 
     try:

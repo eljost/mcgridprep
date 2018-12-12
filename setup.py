@@ -28,8 +28,9 @@ setup(
             "mcgridrun = mcgridprep.run:run",
             "mcgridparse = mcgridprep.parse:run",
             "mcgridplot = mcgridprep.plot:run",
-            "daltongrid = mcgridprep.dalton:run",
-            "daltonplot = mcgridprep.dalton_plot:run",
+            "dalgrid = mcgridprep.dalgrid:run",
+            "dalparse = mcgridprep.dalparse:run",
+            "dalplot = mcgridprep.dalplot:run",
         ]
     },
 )

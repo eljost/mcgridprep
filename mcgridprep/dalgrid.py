@@ -82,17 +82,21 @@ def make_coords(angle, bond):
                 (0, b, a),
                 (0, -b, a),
     ))
+    atoms = "O H H".split()
     if set(CONF["dal_generators"]) == set("X Y".split()):
-        return coords[:2]
-    return coords
+         coords = coords[:2]
+         atoms = atoms[:2]
+    return atoms, coords
 
 
-def make_jobs(coords1, coords2, atoms, basis, charge, id_fmt, prev_id=None):
+def make_jobs(coords1, coords2, basis, charge, id_fmt, prev_id=None):
     jobs = list()
     prev_jobs = list()
     coords_grid = list(it.product(coords1, coords2))
     ids = [id_fmt.format(c1, c2) for c1, c2 in coords_grid]
-    coords = [make_coords(c1, c2) for c1, c2 in coords_grid]
+    atoms_coords = [make_coords(c1, c2) for c1, c2 in coords_grid]
+    atoms, coords = zip(*atoms_coords)
+    atoms = atoms[0]
     mols = [prepare_mol(atoms, c, basis, charge) for c in coords]
     for i, id_ in enumerate(ids):
         dir_ = Path(id_)
@@ -126,14 +130,13 @@ def prepare_job_dirs():
     left_right_ids = [id_fmt.format(*cs)
                       for cs in it.chain(left_right[0][::-1], left_right[1])]
 
-    atoms = "O H H".split()
     basis = CONF["basis"]
     charge = CONF["charge"]
 
     # Expand the up and down coords into two parts of one row
     job_dict = dict()
     for coords_name, (coords1, coords2) in zip(("left", "right"), coords[:2]):
-        jobs, prev_jobs = make_jobs(coords1, coords2, atoms, basis, charge, id_fmt)
+        jobs, prev_jobs = make_jobs(coords1, coords2, basis, charge, id_fmt)
         job_dict[coords_name] = (jobs, prev_jobs)
         print(jobs)
         print(prev_jobs)
@@ -142,7 +145,7 @@ def prepare_job_dirs():
     for coords_name, (coords1, coords2) in zip(("down", "up"), coords[2:]):
         for prev_id, col in zip(left_right_ids, coords1):
             # Have to set the appropriate prev_id somehow
-            jobs, prev_jobs = make_jobs([col, ], coords2, atoms, basis,
+            jobs, prev_jobs = make_jobs([col, ], coords2, basis,
                                         charge, id_fmt, prev_id=prev_id)
             col_name = f"{coords_name}_{col:.2f}"
             job_dict[col_name] = (jobs, prev_jobs)

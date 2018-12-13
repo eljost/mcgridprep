@@ -8,7 +8,7 @@ if sys.version_info.major < 3:
 
 setup(
     name="mcgridprep",
-    version="0.4.2",
+    version="0.4.3",
     description="Prepare/run 2D grids using OpenMolcas.",
     url="https://github.com/eljost/mcgridprep",
     maintainer="Johannes Steinmetzer",
@@ -21,6 +21,7 @@ setup(
         "numpy",
         "jinja2",
         "h5py",
+        "pyyaml",
     ],
     entry_points={
         "console_scripts": [

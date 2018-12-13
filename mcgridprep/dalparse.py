@@ -7,6 +7,7 @@ import sys
 
 from natsort import natsorted
 import numpy as np
+import yaml
 
 from mcgridprep.config import config as CONF
 from mcgridprep.helpers import get_meshgrid, get_all_ids, load_coords
@@ -152,8 +153,19 @@ def run():
     np.save(DPMS_FN, dpms)
     np.save(STAT_POLS_FN, stat_pols)
 
+    yaml_dict = {
+        "grid": GRID_FN,
+        "energies": ENERGIES_FN,
+        "dipoles": DPMS_FN,
+        "stat_pols": STAT_POLS_FN,
+    }
+
     if args.nevpt2:
         np.save(PT2_FN, pt2_energies)
+        yaml_dict["energies"] = PT2_FN
+
+    with open("dash_stark.yaml", "w") as handle:
+        yaml.dump(yaml_dict, handle)
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ DEFAULTS = {
     "coord2_lbl": "",
     # Dalton
     "dal_sym": False,
+    "dal_generators": "",
 }
 
 def load_yaml():

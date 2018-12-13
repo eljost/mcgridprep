@@ -2,7 +2,7 @@ BASIS
 {{ basis }}
 
 
-Atomtypes=2 Charge={{ charge }} {{ sym_str }} Angstrom
+Atomtypes=2 Charge={{ charge }} {{ gen_str }} {{ sym_str }} Angstrom
 {% for charge, atom_num, elem_coords in atoms_data %}
 Charge={{ "%.1f" % charge }} Atoms={{ atom_num }}
 {% for atom, (x, y, z) in elem_coords %}

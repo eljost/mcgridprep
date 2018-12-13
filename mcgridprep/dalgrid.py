@@ -53,10 +53,16 @@ def prepare_mol(atoms, coords, basis, charge):
                     elem_coords,
         ))
     sym_str = "" if CONF["dal_sym"] else "NoSymmetry"
+    generators = CONF["dal_generators"]
+    gen_str = ""
+    if generators:
+        gen_str = f"Generators={len(generators)} {' '.join(generators)}"
+
     mol = MOL_TPL.render(
                       basis=basis,
                       charge=charge,
                       atoms_data=atoms_data,
+                      gen_str=gen_str,
                       sym_str=sym_str,
     )
     return mol
@@ -76,6 +82,8 @@ def make_coords(angle, bond):
                 (0, b, a),
                 (0, -b, a),
     ))
+    if set(CONF["dal_generators"]) == set("X Y".split()):
+        return coords[:2]
     return coords
 
 

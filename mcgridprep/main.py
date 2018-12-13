@@ -113,6 +113,8 @@ xbas
 
 {% if loprop %}
 &loprop
+ delta
+ {{ delta }}
 {% endif %}
 
 {% endfor %}
@@ -241,6 +243,7 @@ def run():
         "spin": CONF["spin"],
         "ciroot": CONF["ciroot"],
         "backup_path": backup_path,
+        "delta": CONF["delta"],
     }
 
     for method in methods:

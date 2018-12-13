@@ -14,6 +14,7 @@ DEFAULTS = {
     "id_fmt": "{:.2f}_{:.2f}",
     "coord1_lbl": "",
     "coord2_lbl": "",
+    "delta": 0.001,
     # Dalton
     "dal_sym": False,
     "dal_generators": "",

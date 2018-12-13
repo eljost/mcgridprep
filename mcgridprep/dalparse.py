@@ -164,7 +164,7 @@ def run():
         np.save(PT2_FN, pt2_energies)
         yaml_dict["energies"] = PT2_FN
 
-    with open("dash_stark.yaml", "w") as handle:
+    with open("fielddressed.yaml", "w") as handle:
         yaml.dump(yaml_dict, handle)
 
 

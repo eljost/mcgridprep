@@ -24,11 +24,17 @@ def plot_energies(C1, C2, energies, title=""):
 def plot_dpms(C1, C2, dpms):
     fig, axs = plt.subplots(3)
     dpm_levels = np.linspace(0, 2, 30)
+
+    # dpm_levels = np.linspace(dpms.min(), dpms.max(), 75)
     for i in range(3):
         ax = axs[i]
         d = dpms[:, :, i]
         cf = ax.contourf(C1, C2, d, levels=dpm_levels)
-        # ax.clabel(cf, colors="w", fmt="%.2f")
+    # neg_inds = dpms[:,:,2] < 0
+    # c1_neg = C1[neg_inds]
+    # c2_neg = C2[neg_inds]
+    # scatter_sizes = np.abs(dpms[neg_inds][:,2] * 50)
+    # axs[2].scatter(c1_neg, c2_neg, s=scatter_sizes)
     fig.colorbar(cf, ax=axs.ravel().tolist())
     fig.suptitle("Perm. DPM / au")
     return fig
@@ -99,10 +105,15 @@ def run():
         pt2_energies[not_nan] -= pt2_energies[not_nan].min()
         pt2_energies *= 27.2114
         pt2_fig = plot_energies(C1, C2, pt2_energies, "PC-NEVPT2")
+        pt2_fig.savfig("nevpt2_ens.pdf")
 
     en_fig = plot_energies(C1, C2, cas_energies, "CAS")
     dpm_fig = plot_dpms(C1, C2, dpms)
     pol_fig = plot_stat_pols(C1, C2, stat_pols)
+
+    en_fig.savefig("cas_ens.pdf")
+    dpm_fig.savefig("dipoles.pdf")
+    pol_fig.savefig("pols.pdf")
     plt.show()
 
 

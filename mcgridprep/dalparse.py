@@ -116,6 +116,7 @@ def run():
     dpms = np.full((*C1.shape, 3), np.nan)
     stat_pols = np.full((*C1.shape, 3), np.nan)
     id_fmt = CONF["id_fmt"]
+    finished = 0
     for (i, j), _ in np.ndenumerate(cas_energies):
         c1 = C1[i,j]
         c2 = C2[i,j]
@@ -123,6 +124,7 @@ def run():
         log_path = Path(f"{c1:.2f}_{c2:.2f}/dalton_xyz.out")
         if not log_path.is_file():
             continue
+        finished += 1
         with open(log_path) as handle:
             text = handle.read()
         try:
@@ -147,6 +149,7 @@ def run():
             stat_pols[i,j] = stat_pol
         except:
             print(f"Error while parsing static polarizabilities from {id_}")
+    print(f"Found {finished} finished calculations.")
 
     np.save(GRID_FN, (C1, C2))
     np.save(ENERGIES_FN, cas_energies)

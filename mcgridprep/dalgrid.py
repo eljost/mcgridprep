@@ -108,7 +108,8 @@ def make_jobs(coords1, coords2, basis, charge, id_fmt, prev_id=None):
         dal_path = dir_ / DAL_FN
         with open(mol_path, "w") as handle:
             handle.write(mols[i])
-        shutil.copy(CONF["dal"], dal_path)
+        org_dal_path = Path(CONF["dal"]).resolve()
+        shutil.copy(org_dal_path, dal_path)
 
         jobs.append(id_)
         prev_jobs.append(prev_id)
@@ -155,10 +156,13 @@ def prepare_job_dirs():
     return job_dict
 
 
-def run_job(job_dir, prev_job_dir=None):
+def run_job(job_dir, prev_job_dir=None, reuse_path=None):
     start = time.time()
     print(f"Running {job_dir}")
-    if prev_job_dir is None:
+    if reuse_path:
+        prev_job_dir = reuse_path / job_dir
+        print(f"Reusing previously converged SIRIRUS.RST from {prev_job_dir}")
+    elif prev_job_dir is None:
         # prev_job_dir = "/scratch/wasser_dalton/start"
         cwd = Path(".").resolve()
         prev_job_dir = cwd / "start"
@@ -180,8 +184,11 @@ def run_job(job_dir, prev_job_dir=None):
 
 def run_part(args):
     job_dirs, prev_job_dirs = args
+    reuse_path = None
+    if CONF["dal_reuse"]:
+        reuse_path = Path(CONF["dal_reuse"])
     for job_dir, prev_dir in zip(job_dirs, prev_job_dirs):
-        run_job(job_dir, prev_dir)
+        run_job(job_dir, prev_dir, reuse_path=reuse_path)
 
 
 def run():

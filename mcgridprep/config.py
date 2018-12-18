@@ -18,6 +18,7 @@ DEFAULTS = {
     # Dalton
     "dal_sym": False,
     "dal_generators": "",
+    "dal_reuse": None,
 }
 
 def load_yaml():

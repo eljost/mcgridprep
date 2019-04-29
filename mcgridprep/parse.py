@@ -79,7 +79,10 @@ def parse_logs(fns, grid_dims):
         pol_grid_fn = "polarization_grid.npy"
         pol_grid = np.zeros((num2, num1, 6))
         for (c2_ind, c1_ind), text in zip(inds, calc_texts):
-            pols = parse_loprop(text)
+            try:
+                pols = parse_loprop(text)
+            except TypeError:
+                import pdb; pdb.set_trace()
             pol_grid[c2_ind, c1_ind] = pols
         np.save(pol_grid_fn, pol_grid)
         print(f"Wrote polarizations to '{pol_grid_fn}'")

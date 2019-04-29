@@ -36,12 +36,22 @@ def run():
         azz = pols[:,:,5]
         comps = "xx yy zz".split()
         label = "$\\alpha_{xx}$"
+
+        pols_ = np.concatenate((axx.flatten(), ayy.flatten(), azz.flatten()))
+        min_ = pols_.min()
+        max_ = pols_.max()
+        # levels = np.linspace(min_, .5*max_, 75)
+        levels = np.linspace(0, min(100, .5*max_), 75)
+        # levels = np.logspace(0, 2.25, 125)
+
         for ax, alpha, comp in zip(axs, (axx, ayy, azz), comps):
-            conf = ax.contourf(C1, C2, alpha)
+            conf = ax.contourf(C1, C2, alpha, levels=levels)
             ax.set_title(f"$\\alpha_{{{comp}}}$")
+            ax.set_ylabel(CONF["coord2_lbl"])
         ax.set_xlabel(CONF["coord1_lbl"])
-        ax.set_ylabel(CONF["coord2_lbl"])
-        fig.colorbar(conf, ax=axs.ravel().tolist())
+        cbar = fig.colorbar(conf, ax=axs.ravel().tolist())
+        cbar.set_label("$\\alpha$ / au")
+        fig.savefig("polarizations.pdf")
         plt.show()
 
     ras_grid = "rasscf_grid.npy"
@@ -73,10 +83,20 @@ def plot_grid(C1, C2, energies, title="", level_num=35):
         state_ens = energies[:,:,state]
         state_ens -= state_ens.min()
         state_ens = np.nan_to_num(state_ens)
+        min_ind = np.unravel_index(state_ens.argmin(), state_ens.shape)
+        x_min = C1[min_ind]
+        y_min = C2[min_ind]
         conf = ax.contourf(C1, C2, state_ens, levels=levels)
-        ax.contour(C1, C2, state_ens, levels=levels, colors="w", linewidths=1)
+        x_lims = ax.get_xlim()
+        y_lims = ax.get_ylim()
+        # ax.contour(C1, C2, state_ens, levels=levels, colors="w", linewidths=1)
+        ax.scatter(x_min, y_min, s=10, c="w")
+        # ax.vlines(x_min, y_lims[0], y_min, color="white", linestyle="--")
+        # ax.hlines(y_min, x_lims[0], x_min, color="white", linestyle="--")
         ax.set_xlabel(CONF["coord1_lbl"])
         ax.set_ylabel(CONF["coord2_lbl"])
+        ax.annotate(f"({x_min}°, {y_min:.2f} Å)", (x_min, y_min), color="white",
+                    xytext=(x_min+1, y_min+0.05))
         cb = fig.colorbar(conf)
         cb.set_label("$\Delta E / eV$")
         plt.show()

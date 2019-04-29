@@ -15,8 +15,24 @@ def plot_energies(C1, C2, energies, title=""):
     fig, ax = plt.subplots()
     levels = np.linspace(0, 15, 35)
     cf = ax.contourf(C1, C2, energies, levels=levels)
+    ax.set_ylabel(CONF["coord2_lbl"])
+    ax.set_xlabel(CONF["coord1_lbl"])
+
+    min_ind = np.unravel_index(energies.argmin(), energies.shape)
+    x_min = C1[min_ind]
+    y_min = C2[min_ind]
+    conf = ax.contourf(C1, C2, energies, levels=levels)
+    x_lims = ax.get_xlim()
+    y_lims = ax.get_ylim()
+    ax.scatter(x_min, y_min, s=10, c="w")
+    ax.set_xlabel(CONF["coord1_lbl"])
+    ax.set_ylabel(CONF["coord2_lbl"])
+    ax.annotate(f"({x_min}°, {y_min:.2f} Å)", (x_min, y_min), color="white",
+                xytext=(x_min+1, y_min+0.05))
+
     # ax.contour(C1, C2, energies, colors="w", levels=levels, alpha=.2)
-    fig.colorbar(cf)
+    cbar = fig.colorbar(cf)
+    cbar.set_label("$\Delta$E / eV")
     fig.suptitle(f"$\Delta E$ / eV, {title}")
     return fig
 
@@ -30,12 +46,15 @@ def plot_dpms(C1, C2, dpms):
         ax = axs[i]
         d = dpms[:, :, i]
         cf = ax.contourf(C1, C2, d, levels=dpm_levels)
+        ax.set_ylabel(CONF["coord2_lbl"])
+    ax.set_xlabel(CONF["coord1_lbl"])
     # neg_inds = dpms[:,:,2] < 0
     # c1_neg = C1[neg_inds]
     # c2_neg = C2[neg_inds]
     # scatter_sizes = np.abs(dpms[neg_inds][:,2] * 50)
     # axs[2].scatter(c1_neg, c2_neg, s=scatter_sizes)
-    fig.colorbar(cf, ax=axs.ravel().tolist())
+    cbar = fig.colorbar(cf, ax=axs.ravel().tolist())
+    cbar.set_label("$\mu$ / au")
     fig.suptitle("Perm. DPM / au")
     return fig
 
@@ -49,8 +68,11 @@ def plot_stat_pols(C1, C2, stat_pols):
         cf = ax.contourf(C1, C2, sp, levels=pol_levels)
         # ax.clabel(cf, colors="w", fmt="%.2f")
         # ax.contour(C1, C2, sp, colors="w", levels=pol_levels)
+        ax.set_ylabel(CONF["coord2_lbl"])
+    ax.set_xlabel(CONF["coord1_lbl"])
     fig.suptitle("Stat. polarizabilities / au")
-    fig.colorbar(cf, ax=axs.ravel().tolist())
+    cbar = fig.colorbar(cf, ax=axs.ravel().tolist())
+    cbar.set_label("$\\alpha$ / au")
     return fig
 
 
@@ -105,7 +127,7 @@ def run():
         pt2_energies[not_nan] -= pt2_energies[not_nan].min()
         pt2_energies *= 27.2114
         pt2_fig = plot_energies(C1, C2, pt2_energies, "PC-NEVPT2")
-        pt2_fig.savfig("nevpt2_ens.pdf")
+        pt2_fig.savefig("nevpt2_ens.pdf")
 
     en_fig = plot_energies(C1, C2, cas_energies, "CAS")
     dpm_fig = plot_dpms(C1, C2, dpms)
